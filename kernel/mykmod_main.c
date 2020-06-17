@@ -40,13 +40,27 @@ static int mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf);
 
 // TODO Data-structure to keep per device info 
 
+struct mykmod_dev_info {
+	char *data;
+	size_t size;
+	int reference;
+};
+
 // TODO Device table data-structure to keep all devices
 
 // Data-structure to keep per VMA info 1 pointer to device info, page faults
 
-struct mykmod_dev_info {
-
+struct mykmod_vma_info {
+	struct mykmod_dev_info *devinfo;
+	unsigned int npagefaults;
 };
+
+// struct vm_fault {
+// 	unsigned int flags;
+// 	pgoff_t pgoff;
+// 	void __user *virtual_address;
+// 	struct page *page;
+// };	
 
 static const struct vm_operations_struct mykmod_vm_ops = {
 	.open  = mykmod_vm_open,
@@ -89,9 +103,16 @@ mykmod_open(struct inode *inodep, struct file *filep)
 		"inodep=%p i_private=%p i_rdev=%x maj:%d min:%d\n",
 		filep, filep->private_data,
 		inodep, inodep->i_private, inodep->i_rdev, MAJOR(inodep->i_rdev), MINOR(inodep->i_rdev));
+	
+	struct mykmod_info *info;
 
 	// TODO: Allocate memory for devinfo and store in device table and i_private.
 	if (inodep->i_private == NULL) {
+		info = kmalloc(sizeof(struct mykmod_dev_info), GFP_KERNEL);
+		info->data = (char*)kmalloc(1024*1024, GFP_KERNEL);
+		memcpy(info->data, "Opening File",12);
+		inodep->i_private = info;
+		// TODO Device table
 	}
 
 	// Store device info in file's private_data aswell
@@ -104,6 +125,9 @@ static int
 mykmod_close(struct inode *inodep, struct file *filep)
 {
 	// TODO: Release memory allocated for data-structures.
+	info = filep->private_data;
+	kfree(info);
+	inodep->i_private = NULL;
 	printk("mykmod_close: inodep=%p filep=%p\n", inodep, filep);
 	return 0;
 }
@@ -113,31 +137,60 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)
 	printk("mykmod_mmap: filp=%p vma=%p flags=%lx\n", filp, vma, vma->vm_flags);
 
 	//TODO setup vma's flags, save private data (devinfo, npagefaults) in vm_private_data
+	vma -> vm_ops = &mykmod_vm_ops;
+	vma -> vm_flags |= VM_DONTDUMP |= VM_DONTEXPAND; // dont include in core dump and cannot expand with mremap()
+
+	struct mykmod_vma_info *info;
+	info = kmalloc(sizeof(struct mykmod_vma_info), GFP_KERNEL);
+	info -> devinfo = filp -> private_data;
+	vma -> vm_private_data = info;
+	// vma->vm_private_data = filp->f_inode->i_private;
+	
 	mykmod_vm_open(vma);
 
-	return -ENOSYS; // Remove this once mmap is implemented.
+	// return -ENOSYS; // Remove this once mmap is implemented.
 	return 0;
 }
 
 static void
 mykmod_vm_open(struct vm_area_struct *vma)
 {
-	//printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma, ?);
+	printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma, ?);
 }
 
 static void
 mykmod_vm_close(struct vm_area_struct *vma)
 {
-	//printk("mykmod_vm_close: vma=%p npagefaults:%lu\n", vma, ?);
+	printk("mykmod_vm_close: vma=%p npagefaults:%lu\n", vma, ?);
 }
 
 static int
 mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
-{
-	//printk("mykmod_vm_fault: vma=%p vmf=%p pgoff=%lu page=%p\n", vma, vmf, vmf->pgoff, vmf->page);
+{	
+	printk("mykmod_vm_fault: vma=%p vmf=%p pgoff=%lu page=%p\n", vma, vmf, vmf->pgoff, vmf->page);
 	// TODO: build virt->phys mappings
+	struct page *page;
+	struct mykmod_info *info;
+	info = (struct mykmod_dev_info*)vma->vm_private_data;
+	if(info->data){
+		page = virt_to_page(info->data);
+		get_page(page);
+		vmf->page =  page;
+	}
+
 
 	return 0;
 }
+    // struct page *pageptr;
+    // unsigned long offset = vma->vm_pgoff << PAGE_SHIFT;
+    // unsigned long physaddr = address - vma->vm_start + offset;
+    // unsigned long pageframe = physaddr >> PAGE_SHIFT;
 
+    // if (!pfn_valid(pageframe))
+    //     return NOPAGE_SIGBUS;
+    // pageptr = pfn_to_page(pageframe);
+    // get_page(pageptr);
+    // if (type)
+    //     *type = VM_FAULT_MINOR;
+    // return pageptr;
 
