@@ -175,7 +175,7 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)
 
 	//TODO setup vma's flags, save private data (devinfo, npagefaults) in vm_private_data
 	vma -> vm_ops = &mykmod_vm_ops;
-	vma -> vm_flags |= VM_DONTDUMP |= VM_DONTEXPAND; // dont include in core dump and cannot expand with mremap()
+	vma -> vm_flags |= VM_DONTDUMP | VM_DONTEXPAND; // dont include in core dump and cannot expand with mremap()
 
 	struct mykmod_vma_info *info;
 	info = kmalloc(sizeof(struct mykmod_vma_info), GFP_KERNEL);
@@ -192,13 +192,13 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)
 static void
 mykmod_vm_open(struct vm_area_struct *vma)
 {
-	printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma,vma->private_data->npagefaults);
+	printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma,vma->vm_private_data->npagefaults);
 }
 
 static void
 mykmod_vm_close(struct vm_area_struct *vma)
 {
-	printk("mykmod_vm_close: vma=%p npagefaults:%lu\n", vma, vma->private_data->npagefaults);
+	printk("mykmod_vm_close: vma=%p npagefaults:%lu\n", vma, vma->vm_private_data->npagefaults);
 }
 
 static int
@@ -215,7 +215,7 @@ mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		vmf->page =  page;
 	}
 
-	vma->private_data->npagefaults++;
+	vma->vm_private_data->npagefaults++;
 
 
 	return 0;
