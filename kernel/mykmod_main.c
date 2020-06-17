@@ -95,7 +95,15 @@ static void mykmod_cleanup_module(void)
 	printk("mykmod unloaded\n");
 	unregister_chrdev(mykmod_major,"mykmod");
 	// TODO free device info structures from device table
+	int i = 0;
+	while (i<MYKMOD_MAX_DEVS)
+	{
+		kfree(dev_table[i]);
+	}	
+	
 	kfree(dev_table);
+
+	
 
 	return;
 }
@@ -134,26 +142,26 @@ static int
 mykmod_close(struct inode *inodep, struct file *filep)
 {
 	// TODO: Release memory allocated for data-structures.
-	struct mykmod_dev_info *info;
-	info = filep->private_data;
-	bool match = false;
-	int i = 0;
+	// struct mykmod_dev_info *info;
+	// info = filep->private_data;
+	// bool match = false;
+	// int i = 0;
 
-	while(dev_table[i] != NULL) {
-		if(dev_table[i] == info) {
-			kfree(dev_table[i]);
-			match = true;
-			break;
-		}
-		i++;
-	}
+	// while(dev_table[i] != NULL) {
+	// 	if(dev_table[i] == info) {
+	// 		kfree(dev_table[i]);
+	// 		match = true;
+	// 		break;
+	// 	}
+	// 	i++;
+	// }
 
-	if(match && i<255) {
-		while(dev_table[i+1] != NULL) {
-			dev_table[i] = dev_table[i+1];
-			i++; 
-		}
-	}
+	// if(match && i<255) {
+	// 	while(dev_table[i+1] != NULL) {
+	// 		dev_table[i] = dev_table[i+1];
+	// 		i++; 
+	// 	}
+	// }
 	// kfree(info);
 	// inodep->i_private = NULL;
 
