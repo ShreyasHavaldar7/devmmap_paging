@@ -150,7 +150,7 @@ mykmod_close(struct inode *inodep, struct file *filep)
 
 	if(match && i<255) {
 		while(dev_table[i+1] != NULL) {
-			dev_table[i] == dev_table[i];
+			dev_table[i] = dev_table[i+1];
 			i++; 
 		}
 	}
@@ -184,13 +184,13 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)
 static void
 mykmod_vm_open(struct vm_area_struct *vma)
 {
-	printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma, ?);
+	printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma,vma->private_data->npagefaults);
 }
 
 static void
 mykmod_vm_close(struct vm_area_struct *vma)
 {
-	printk("mykmod_vm_close: vma=%p npagefaults:%lu\n", vma, ?);
+	printk("mykmod_vm_close: vma=%p npagefaults:%lu\n", vma, vma->private_data->npagefaults);
 }
 
 static int
@@ -212,7 +212,7 @@ mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 
 	return 0;
 }
-    // struct page *pageptr;
+    // struct page *pageptr; 
     // unsigned long offset = vma->vm_pgoff << PAGE_SHIFT;
     // unsigned long physaddr = address - vma->vm_start + offset;
     // unsigned long pageframe = physaddr >> PAGE_SHIFT;
