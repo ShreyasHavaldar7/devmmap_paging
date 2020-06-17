@@ -43,10 +43,12 @@ static int mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf);
 struct mykmod_dev_info {
 	char *data;
 	size_t size;
-	int reference;
+	// int reference;
 };
 
 // TODO Device table data-structure to keep all devices
+
+struct mykmod_dev_info *dev_table;
 
 // Data-structure to keep per VMA info 1 pointer to device info, page faults
 
@@ -83,6 +85,7 @@ static int mykmod_init_module(void)
 		printk("register character device %d\n", mykmod_major);
 	}
 	// TODO initialize device table
+	dev_table = kmalloc(MYKMOD_MAX_DEVS*sizeof(struct mykmod_dev_info), GFP_KERNEL);
 
 	return 0;
 }
@@ -109,7 +112,7 @@ mykmod_open(struct inode *inodep, struct file *filep)
 	// TODO: Allocate memory for devinfo and store in device table and i_private.
 	if (inodep->i_private == NULL) {
 		info = kmalloc(sizeof(struct mykmod_dev_info), GFP_KERNEL);
-		info->data = (char*)kmalloc(1024*1024, GFP_KERNEL);
+		info->data = (char*)kmalloc(MYDEV_LEN, GFP_KERNEL);
 		memcpy(info->data, "Opening File",12);
 		inodep->i_private = info;
 		// TODO Device table
@@ -177,6 +180,8 @@ mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		get_page(page);
 		vmf->page =  page;
 	}
+
+	vma->private_data->npagefaults++;
 
 
 	return 0;
