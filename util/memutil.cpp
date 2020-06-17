@@ -179,10 +179,20 @@ int main(int argc, char *argv[])
 				// memory map the devicemem's kernel buffer into user-space segment.
 				dev_mem = (char *)mmap(NULL, MYDEV_LEN, PROT_READ, mmap_flags, dev_fd, off); 
 				// TODO
+<<<<<<< HEAD
 				if (dev_mem == MAP_FAILED) {
 					perror("mmap read failed");
 					exit(3);
 				}
+=======
+				dev_mem=(char*)mmap(NULL,MYDEV_LEN,PROT_READ,MAP_SHARED,dev_fd,off);
+                if (dev_mem == MAP_FAILED) {
+					perror("mmap read failed");
+					exit(3);
+				}
+				
+				
+>>>>>>> 69aba3b545f9a08a989b1dc8fdb75de992e1e69f
 				// Compare the data read from devicemem with msg
 				// DONOT define an array of MYDEV_LEN. Seriously! Dont need array of MYDEV_LEN size.
 				// TODO. Hint use loop & modulus operator on msg to compare the string with entire device_mem
@@ -196,6 +206,7 @@ int main(int argc, char *argv[])
 				// unmap the devicemem's kernel buffer.
 				munmap(dev_mem, MYDEV_LEN);
 				// TODO
+				munmap(dev_mem,MYDEV_LEN);
 
 				break;
 			}
@@ -226,6 +237,7 @@ int main(int argc, char *argv[])
 				// unmap the devicemem's kernel buffer.
 				munmap(dev_mem, MYDEV_LEN);
 				// TODO
+				munmap(dev_mem,MYDEV_LEN);
 
 				break;
 			}
