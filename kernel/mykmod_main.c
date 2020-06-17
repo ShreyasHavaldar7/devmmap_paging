@@ -96,15 +96,12 @@ static void mykmod_cleanup_module(void)
 	unregister_chrdev(mykmod_major,"mykmod");
 	// TODO free device info structures from device table
 	int i = 0;
-	while (i<MYKMOD_MAX_DEVS)
+	while (i<MYKMOD_MAX_DEVS && dev_table[i]!= NULL)
 	{
 		kfree(dev_table[i]);
 	}	
 	
 	kfree(dev_table);
-
-	
-
 	return;
 }
 
@@ -126,10 +123,13 @@ mykmod_open(struct inode *inodep, struct file *filep)
 		inodep -> i_private = info;
 		
 		int i = 0;
-		while(dev_table[i] != NULL) {
+		while(i<MYKMOD_MAX_DEVS && dev_table[i] != NULL) {
 			i++;
 		}
-		dev_table[i] = info;		// TODO Device table
+		if(i<MYKMOD_MAX_DEVS) {
+			dev_table[i] = info;		// TODO Device table
+
+		}
 	}
 
 	// Store device info in file's private_data aswell

@@ -89,8 +89,10 @@ int main(int argc, char *argv[])
 
 				if (strcmp("demand", optarg) == 0) {
 					//TODO mmap_flags = ??;
+					mmap_flags = MAP_SHARED;
 				} else if (strcmp("prefetch", optarg) == 0) {
 					//TODO mmap_flags = ??
+					mmap_flags = MAP_POPULATE;
 				} else {
 					cerr << "Invalid operation: " << optarg << "\n";
 					print_help(argv[0], -1);
@@ -175,13 +177,24 @@ int main(int argc, char *argv[])
 				off_t off = 0;
 				size_t len;
 				// memory map the devicemem's kernel buffer into user-space segment.
+				dev_mem = (char *)mmap(NULL, MYDEV_LEN, PROT_READ, mmap_flags, dev_fd, off); 
 				// TODO
-
+				if (dev_mem == MAP_FAILED) {
+					perror("mmap read failed");
+					exit(3);
+				}
 				// Compare the data read from devicemem with msg
 				// DONOT define an array of MYDEV_LEN. Seriously! Dont need array of MYDEV_LEN size.
 				// TODO. Hint use loop & modulus operator on msg to compare the string with entire device_mem
-			
+				for (int i = 0; i < msg_len && i < MYDEV_LEN; i++)
+				{
+					if (msg[i] != *(dev_mem + i))
+					{
+						cerr << "Read error";
+					}
+				}				
 				// unmap the devicemem's kernel buffer.
+				munmap(dev_mem, MYDEV_LEN);
 				// TODO
 
 				break;
@@ -191,13 +204,27 @@ int main(int argc, char *argv[])
 				off_t off = 0;
 				size_t len;
 				// memory map the devicemem's kernel buffer into user-space segment.
+				dev_mem = (char *)mmap(NULL, MYDEV_LEN, PROT_WRITE, mmap_flags, dev_fd, off);
 				// TODO
-
+				if (dev_mem == MAP_FAILED) {
+					perror("mmap write failed");
+					exit(3);
+				}
 				// Write the message to devicemem from msg.
 				// DONOT define an array of MYDEV_LEN. Seriously! Dont need array of MYDEV_LEN size.
+				// len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;
+				// if (len <= 0) {
+				// 	break;
+				// }
+				for (int i = 0; i < msg_len && i < MYDEV_LEN; i++)
+				{
+					*(dev_mem + i) = msg[i] ;
+
+				}
 				// TODO. Hint use loop & modulus operator on msg to copy the string to entire device_mem
 
 				// unmap the devicemem's kernel buffer.
+				munmap(dev_mem, MYDEV_LEN);
 				// TODO
 
 				break;
