@@ -48,13 +48,13 @@ struct mykmod_dev_info {
 
 // TODO Device table data-structure to keep all devices
 
-struct mykmod_dev_info *dev_table;
+struct mykmod_dev_info **dev_table;
 
 // Data-structure to keep per VMA info 1 pointer to device info, page faults
 
 struct mykmod_vma_info {
 	struct mykmod_dev_info *devinfo;
-	unsigned int npagefaults;
+	long unsigned int npagefaults;
 };
 
 // struct vm_fault {
@@ -96,9 +96,9 @@ static void mykmod_cleanup_module(void)
 	unregister_chrdev(mykmod_major,"mykmod");
 	// TODO free device info structures from device table
 	int i = 0;
-	while (i<MYKMOD_MAX_DEVS && *dev_table[i]!= NULL)
+	while (i<MYKMOD_MAX_DEVS && dev_table[i]!= NULL)
 	{
-		kfree(*dev_table[i]);
+		kfree(dev_table[i]);
 	}	
 	
 	kfree(dev_table);
@@ -123,11 +123,11 @@ mykmod_open(struct inode *inodep, struct file *filep)
 		inodep -> i_private = info;
 		
 		int i = 0;
-		while(i<MYKMOD_MAX_DEVS && *dev_table[i] != NULL) {
+		while(i<MYKMOD_MAX_DEVS && dev_table[i] != NULL) {
 			i++;
 		}
 		if(i<MYKMOD_MAX_DEVS) {
-			dev_table[i] = *info;		// TODO Device table
+			dev_table[i] = info;		// TODO Device table
 
 		}
 	}
@@ -192,13 +192,17 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)
 static void
 mykmod_vm_open(struct vm_area_struct *vma)
 {
-	printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma,*vma->vm_private_data->npagefaults);
+	struct mykmod_vma_info *info1;
+	info1=vma->vm_private_data;
+	printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma,info1->npagefaults);
 }
 
 static void
 mykmod_vm_close(struct vm_area_struct *vma)
-{
-	printk("mykmod_vm_close: vma=%p npagefaults:%lu\n", vma, *vma->vm_private_data->npagefaults);
+{   
+	struct mykmod_vma_info *info1;
+	info1=vma->vm_private_data;
+	printk("mykmod_vm_close: vma=%p npagefaults:%lu\n", vma,info1->npagefaults);
 }
 
 static int
@@ -214,8 +218,11 @@ mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		get_page(page);
 		vmf->page =  page;
 	}
-
-	*vma->vm_private_data->npagefaults++;
+    
+	struct mykmod_vma_info *info1;
+	info1=vma->vm_private_data;
+	info1->npagefaults++;
+	vma->vm_private_data=info1;
 
 
 	return 0;
