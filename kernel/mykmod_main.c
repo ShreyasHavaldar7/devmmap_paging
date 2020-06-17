@@ -95,6 +95,7 @@ static void mykmod_cleanup_module(void)
 	printk("mykmod unloaded\n");
 	unregister_chrdev(mykmod_major,"mykmod");
 	// TODO free device info structures from device table
+	kfree(dev_table);
 
 	return;
 }
@@ -107,15 +108,20 @@ mykmod_open(struct inode *inodep, struct file *filep)
 		filep, filep->private_data,
 		inodep, inodep->i_private, inodep->i_rdev, MAJOR(inodep->i_rdev), MINOR(inodep->i_rdev));
 	
-	struct mykmod_info *info;
+	struct mykmod_dev_info *info;
 
 	// TODO: Allocate memory for devinfo and store in device table and i_private.
 	if (inodep->i_private == NULL) {
 		info = kmalloc(sizeof(struct mykmod_dev_info), GFP_KERNEL);
-		info->data = (char*)kmalloc(MYDEV_LEN, GFP_KERNEL);
-		memcpy(info->data, "Opening File",12);
-		inodep->i_private = info;
-		// TODO Device table
+		info -> data = (char*)kmalloc(MYDEV_LEN, GFP_KERNEL);
+		memcpy(info -> data, "Opening File",12);
+		inodep -> i_private = info;
+		
+		int i = 0;
+		while(dev_table[i] != NULL) {
+			i++;
+		}
+		dev_table[i] = info;		// TODO Device table
 	}
 
 	// Store device info in file's private_data aswell
@@ -128,9 +134,29 @@ static int
 mykmod_close(struct inode *inodep, struct file *filep)
 {
 	// TODO: Release memory allocated for data-structures.
+	struct mykmod_dev_info *info;
 	info = filep->private_data;
-	kfree(info);
-	inodep->i_private = NULL;
+	bool match = false;
+	int i = 0;
+
+	while(dev_table[i] != NULL) {
+		if(dev_table[i] == info) {
+			kfree(dev_table[i]);
+			match = true;
+			break;
+		}
+		i++;
+	}
+
+	if(match && i<255) {
+		while(dev_table[i+1] != NULL) {
+			dev_table[i] == dev_table[i];
+			i++; 
+		}
+	}
+	// kfree(info);
+	// inodep->i_private = NULL;
+
 	printk("mykmod_close: inodep=%p filep=%p\n", inodep, filep);
 	return 0;
 }
@@ -173,7 +199,7 @@ mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 	printk("mykmod_vm_fault: vma=%p vmf=%p pgoff=%lu page=%p\n", vma, vmf, vmf->pgoff, vmf->page);
 	// TODO: build virt->phys mappings
 	struct page *page;
-	struct mykmod_info *info;
+	struct mykmod_dev_info *info;
 	info = (struct mykmod_dev_info*)vma->vm_private_data;
 	if(info->data){
 		page = virt_to_page(info->data);
