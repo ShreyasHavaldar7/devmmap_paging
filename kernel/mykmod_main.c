@@ -96,9 +96,9 @@ static void mykmod_cleanup_module(void)
 	unregister_chrdev(mykmod_major,"mykmod");
 	// TODO free device info structures from device table
 	int i = 0;
-	while (i<MYKMOD_MAX_DEVS && dev_table[i]!= NULL)
+	while (i<MYKMOD_MAX_DEVS && *dev_table[i]!= NULL)
 	{
-		kfree(dev_table[i]);
+		kfree(*dev_table[i]);
 	}	
 	
 	kfree(dev_table);
@@ -123,11 +123,11 @@ mykmod_open(struct inode *inodep, struct file *filep)
 		inodep -> i_private = info;
 		
 		int i = 0;
-		while(i<MYKMOD_MAX_DEVS && dev_table[i] != NULL) {
+		while(i<MYKMOD_MAX_DEVS && *dev_table[i] != NULL) {
 			i++;
 		}
 		if(i<MYKMOD_MAX_DEVS) {
-			dev_table[i] = info;		// TODO Device table
+			dev_table[i] = *info;		// TODO Device table
 
 		}
 	}
@@ -192,13 +192,13 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)
 static void
 mykmod_vm_open(struct vm_area_struct *vma)
 {
-	printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma,vma->vm_private_data->npagefaults);
+	printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma,*vma->vm_private_data->npagefaults);
 }
 
 static void
 mykmod_vm_close(struct vm_area_struct *vma)
 {
-	printk("mykmod_vm_close: vma=%p npagefaults:%lu\n", vma, vma->vm_private_data->npagefaults);
+	printk("mykmod_vm_close: vma=%p npagefaults:%lu\n", vma, *vma->vm_private_data->npagefaults);
 }
 
 static int
@@ -215,7 +215,7 @@ mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		vmf->page =  page;
 	}
 
-	vma->vm_private_data->npagefaults++;
+	*vma->vm_private_data->npagefaults++;
 
 
 	return 0;
