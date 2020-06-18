@@ -214,12 +214,12 @@ mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 	info_fault = vma->vm_private_data;
 
 	// TODO: build virt->phys mappings
-	if (info_fault != NULL || info_fault->devinfo->data == NULL)
+	if (info_fault != NULL || info_fault->devinfo->data != NULL)
 	{
 		
 		info_fault->npagefaults++;
 		struct page *page;
-		page = virt_to_page(info->devinfo->data);
+		page = virt_to_page(info_fault->devinfo->data);
 		get_page(page);
 		vmf->page = page;
 		vmf->pgoff = vma->vm_pgoff;
