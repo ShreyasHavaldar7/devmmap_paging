@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 					mmap_flags = MAP_SHARED;
 				} else if (strcmp("prefetch", optarg) == 0) {
 					//TODO mmap_flags = ??
-					mmap_flags = MAP_POPULATE;
+					mmap_flags = MAP_SHARED | MAP_POPULATE;
 				} else {
 					cerr << "Invalid operation: " << optarg << "\n";
 					print_help(argv[0], -1);

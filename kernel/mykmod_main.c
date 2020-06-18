@@ -181,6 +181,7 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)
 	info = kmalloc(sizeof(struct mykmod_vma_info), GFP_KERNEL);
 	info -> devinfo = filp -> private_data;
 	vma -> vm_private_data = info;
+
 	// vma->vm_private_data = filp->f_inode->i_private;
 	
 	mykmod_vm_open(vma);
@@ -194,6 +195,7 @@ mykmod_vm_open(struct vm_area_struct *vma)
 {
 	struct mykmod_vma_info *info1;
 	info1=vma->vm_private_data;
+	info1 -> npagefaults = 0;
 	printk("mykmod_vm_open: vma=%p npagefaults:%lu\n", vma,info1->npagefaults);
 }
 
