@@ -99,6 +99,7 @@ static void mykmod_cleanup_module(void)
 	while (i<MYKMOD_MAX_DEVS && dev_table[i]!= NULL)
 	{
 		kfree(dev_table[i]);
+		i++;
 	}	
 	
 	kfree(dev_table);
