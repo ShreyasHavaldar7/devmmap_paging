@@ -15,6 +15,7 @@ MODULE_LICENSE("GPL");
 // Dynamically allocate major no
 #define MYKMOD_MAX_DEVS 256
 #define MYKMOD_DEV_MAJOR 0
+#define PAGE_SIZE 4096
 
 static int mykmod_init_module(void);
 static void mykmod_cleanup_module(void);
@@ -221,7 +222,7 @@ mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		info_fault->npagefaults++;
 		struct page *page;
 		// page = virt_to_page(info_fault->devinfo->data);
-		page = virt_to_page(info_fault + (vmf -> pgoff*4096));
+		page = virt_to_page(info_fault + (vmf->pgoff * PAGE_SIZE));
 
 		get_page(page);
 		vmf->page = page;
