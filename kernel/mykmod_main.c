@@ -209,26 +209,45 @@ mykmod_vm_close(struct vm_area_struct *vma)
 
 static int
 mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
-{	
-	printk("mykmod_vm_fault: vma=%p vmf=%p pgoff=%lu page=%p\n", vma, vmf, vmf->pgoff, vmf->page);
+{
+	struct mykmod_vma_info *info_fault;
+	info_fault = vma->vm_private_data;
+
 	// TODO: build virt->phys mappings
-	struct page *page;
-	struct mykmod_dev_info *info;
-	info = (struct mykmod_dev_info*)vma->vm_private_data;
-	if(info->data){
-		page = virt_to_page(info->data);
+	if (info_fault != NULL || info_fault->devinfo->data == NULL)
+	{
+		
+		info_fault->npagefaults++;
+		struct page *page;
+		page = virt_to_page(info->devinfo->data);
 		get_page(page);
-		vmf->page =  page;
+		vmf->page = page;
+		vmf->pgoff = vma->vm_pgoff;
+
+		printk("mykmod_vm_fault: vma=%p vmf=%p pgoff=%lu page=%p\n", vma, vmf, vmf->pgoff, vmf->page);
 	}
-    
-	struct mykmod_vma_info *info1;
-	info1=vma->vm_private_data;
-	info1->npagefaults++;
-	vma->vm_private_data=info1;
-
-
 	return 0;
+
+	// printk("mykmod_vm_fault: vma=%p vmf=%p pgoff=%lu page=%p\n", vma, vmf, vmf->pgoff, vmf->page);
+	// // TODO: build virt->phys mappings
+	// struct page *page;
+	// struct mykmod_dev_info *info;
+	// info = (struct mykmod_dev_info*)vma->vm_private_data;
+	// if(info->data){
+	// 	page = virt_to_page(info->data);
+	// 	get_page(page);
+	// 	vmf->page =  page;
+	// }
+    
+	// struct mykmod_vma_info *info1;
+	// info1=vma->vm_private_data;
+	// info1->npagefaults++;
+	// vma->vm_private_data=info1;
+
+
+	// return 0;
 }
+
     // struct page *pageptr; 
     // unsigned long offset = vma->vm_pgoff << PAGE_SHIFT;
     // unsigned long physaddr = address - vma->vm_start + offset;
