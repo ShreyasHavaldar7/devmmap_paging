@@ -183,23 +183,47 @@ int main(int argc, char *argv[])
 					perror("mmap read failed");
 					exit(3);
 				}
+				if (msg != NULL) {
+				// for (int i = 0; i < msg_len && i < MYDEV_LEN; i++)
+				// {
+				// 	if (msg[i] != *(mem + i))
+				// 	{
+				// 		cerr << "Read error";
+				// 		ret = -1;
+				// 	}
+				// }
+					do {
+						len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;
+						for (int i = 0; i < len; i++) {
+							if (msg[i] != *(dev_mem + off + i))	{
+								cerr << "Read error";
+								ret = -1;
+							}
+						}
+						off += len;
+						if (off == MYDEV_LEN)
+							break;
+					} while (true);
+				}
 				// Compare the data read from devicemem with msg
 				// DONOT define an array of MYDEV_LEN. Seriously! Dont need array of MYDEV_LEN size.
 				// TODO. Hint use loop & modulus operator on msg to compare the string with entire device_mem
-				for (int i = 0; i < msg_len && i < MYDEV_LEN; i++)
-				{
-					if (msg[i] != *(dev_mem + i))
-					{
-						cerr << "Read error";
-					}
-				}				
-				// unmap the devicemem's kernel buffer.
+				// for (int i = 0; i < msg_len && i < MYDEV_LEN; i++)
+				// {
+				// 	if (msg[i] != *(dev_mem + i))
+				// 	{
+				// 		cerr << "Read error";
+				// 	}
+				// }				
+				// // unmap the devicemem's kernel buffer.
 				// TODO
 				munmap(dev_mem,MYDEV_LEN);
 
 				break;
 			}
 
+			
+			// munmap(mem, MYDEV_LEN);
 			case OP_MAPWRITE: {
 				off_t off = 0;
 				size_t len;
@@ -216,11 +240,21 @@ int main(int argc, char *argv[])
 				// if (len <= 0) {
 				// 	break;
 				// }
-				for (int i = 0; i < msg_len && i < MYDEV_LEN; i++)
-				{
-					*(dev_mem + i) = msg[i] ;
+				do {
+					len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;
+					if (len<=0) {
+						break;
+					}
+					*(dev_mem + i) = msg[i] ;					
+					off += len;
+					if (off == MYDEV_LEN)
+						break;
+				} while (true);
+				// for (int i = 0; i < msg_len && i < MYDEV_LEN; i++)
+				// {
+				// 	*(dev_mem + i) = msg[i] ;
 
-				}
+				// }
 				// TODO. Hint use loop & modulus operator on msg to copy the string to entire device_mem
 
 				// unmap the devicemem's kernel buffer.
