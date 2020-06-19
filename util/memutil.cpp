@@ -194,6 +194,9 @@ int main(int argc, char *argv[])
 				// }
 					do {
 						len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;
+						if (len<=0) {
+						break;
+					    }
 						for (int i = 0; i < len; i++) {
 							if (msg[i] != *(dev_mem + off + i))	{
 								cerr << "Read error";
@@ -245,7 +248,9 @@ int main(int argc, char *argv[])
 					if (len<=0) {
 						break;
 					}
-					*(dev_mem + i) = msg[i] ;					
+					for (int i = 0; i < len; i++) {
+					*(dev_mem + off + i) = msg[i] ;
+					}					
 					off += len;
 					if (off == MYDEV_LEN)
 						break;
