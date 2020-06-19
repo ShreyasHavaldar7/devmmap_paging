@@ -222,7 +222,7 @@ mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 		info_fault->npagefaults++;
 		struct page *page;
 		// page = virt_to_page(info_fault->devinfo->data);
-		page = virt_to_page(info_fault->devinfo->data + (vmf->pgoff * PAGE_SIZE));
+		page = virt_to_page(info_fault->devinfo->data + ((vmf->pgoff + vma->pgoff) * PAGE_SIZE));
 
 		get_page(page);
 		vmf->page = page;
