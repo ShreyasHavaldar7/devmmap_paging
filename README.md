@@ -22,7 +22,9 @@ make[1]: `memutil' is up to date.
 make[1]: Leaving directory `/root/devmmap_paging/util'
 
 [root@cs3523 devmmap_paging]# insmod kernel/mykmod.ko
-[root@cs3523 devmmap_paging]# grep mykmod /proc/devices243 mykmod
+[root@cs3523 devmmap_paging]# grep mykmod /proc/devices
+243 mykmod
+
 ------------------------------------------------------------------
 # INSTRUCTIONS TO RUN (NOT USING THE TEST SCRIPT)
 SYNTAX
@@ -37,58 +39,113 @@ Options:
 # SAMPLE OUTPUTS WITHOUT USING TEST SCRIPT
 
 
-CASE 1:PREFETCH (READ ONLY)
+# CASE 1:PREFETCH (READ ONLY)
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_pR6 c 243 10
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_pR6 --pt prefetch --op mapread
 [root@cs3523 devmmap_paging]# dmesg | grep -e mykmod_vm_open -e mykmod_vm_close
 
-[  594.884897] mykmod_vm_open: vma=ffff99b7785a91b0 npagefaults:0
-[  594.885472] mykmod_vm_close: vma=ffff99b7785a91b0 npagefaults:256
+[  151.570537] mykmod_vm_open: vma=ffff9a0f787961b0 npagefaults:0
+[  151.572697] mykmod_vm_close: vma=ffff9a0f787961b0 npagefaults:256
 ------------------------------------------------------------------------------------------------------
 
-CASE 2:DEMAND (READ ONLY)
+# CASE 2:DEMAND (READ ONLY)
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_JZ1 c 243 11
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_JZ1 --pt demand --op mapread
 [root@cs3523 devmmap_paging]# dmesg | grep -e mykmod_vm_open -e mykmod_vm_close
 
-[  594.884897] mykmod_vm_open: vma=ffff99b7785a91b0 npagefaults:0
-[  594.885472] mykmod_vm_close: vma=ffff99b7785a91b0 npagefaults:256
-[  706.687035] mykmod_vm_open: vma=ffff99b775230360 npagefaults:0
-[  706.687061] mykmod_vm_close: vma=ffff99b775230360 npagefaults:0
+[  151.570537] mykmod_vm_open: vma=ffff9a0f787961b0 npagefaults:0
+[  151.572697] mykmod_vm_close: vma=ffff9a0f787961b0 npagefaults:256
+[  248.623157] mykmod_vm_open: vma=ffff9a0f78796288 npagefaults:0
+[  248.623164] mykmod_vm_close: vma=ffff9a0f78796288 npagefaults:0
 ------------------------------------------------------------------------------------------------------
 
-CASE 3:PREFETCH (READ AND WRITE)
+# CASE 3a:PREFETCH (READ AND WRITE):MESSAGE LENGTH<=PAGESIZE(4096)
+
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_fBc c 243 20
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_fBc --pt prefetch --op mapwrite --op mapread --mes test2
 [root@cs3523 devmmap_paging]# dmesg | grep -e mykmod_vm_open -e mykmod_vm_close
 
-[  594.884897] mykmod_vm_open: vma=ffff99b7785a91b0 npagefaults:0
-[  594.885472] mykmod_vm_close: vma=ffff99b7785a91b0 npagefaults:256
-[  706.687035] mykmod_vm_open: vma=ffff99b775230360 npagefaults:0
-[  706.687061] mykmod_vm_close: vma=ffff99b775230360 npagefaults:0
-[  911.297362] mykmod_vm_open: vma=ffff99b7f8177510 npagefaults:0
-[  911.298046] mykmod_vm_close: vma=ffff99b7f8177510 npagefaults:256
-[  911.298054] mykmod_vm_open: vma=ffff99b7f8177510 npagefaults:0
-[  911.298720] mykmod_vm_close: vma=ffff99b7f8177510 npagefaults:256
+[  151.570537] mykmod_vm_open: vma=ffff9a0f787961b0 npagefaults:0
+[  151.572697] mykmod_vm_close: vma=ffff9a0f787961b0 npagefaults:256
+[  248.623157] mykmod_vm_open: vma=ffff9a0f78796288 npagefaults:0
+[  248.623164] mykmod_vm_close: vma=ffff9a0f78796288 npagefaults:0
+[  368.153225] mykmod_vm_open: vma=ffff9a0f78796360 npagefaults:0
+[  368.153907] mykmod_vm_close: vma=ffff9a0f78796360 npagefaults:256
+[  368.153915] mykmod_vm_open: vma=ffff9a0f78796360 npagefaults:0
+[  368.165094] mykmod_vm_close: vma=ffff9a0f78796360 npagefaults:256
+
+# CASE 3b:PREFETCH (READ AND WRITE):MESSAGE LENGTH>PAGESIZE(4096)
+
+[root@cs3523 devmmap_paging]# mknod /tmp/mydev_fAc c 243 21
+[root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_fAc --pt prefetch --op mapwrite --op mapread --mes ThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisenthereforealwaysholdsiinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewistothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprinciofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleshello
+
+[root@cs3523 devmmap_paging]# dmesg | grep -e mykmod_vm_open -e mykmod_vm_close
+
+[  151.570537] mykmod_vm_open: vma=ffff9a0f787961b0 npagefaults:0
+[  151.572697] mykmod_vm_close: vma=ffff9a0f787961b0 npagefaults:256
+[  248.623157] mykmod_vm_open: vma=ffff9a0f78796288 npagefaults:0
+[  248.623164] mykmod_vm_close: vma=ffff9a0f78796288 npagefaults:0
+[  368.153225] mykmod_vm_open: vma=ffff9a0f78796360 npagefaults:0
+[  368.153907] mykmod_vm_close: vma=ffff9a0f78796360 npagefaults:256
+[  368.153915] mykmod_vm_open: vma=ffff9a0f78796360 npagefaults:0
+[  368.165094] mykmod_vm_close: vma=ffff9a0f78796360 npagefaults:256
+[  472.266659] mykmod_vm_open: vma=ffff9a0f73fed5e8 npagefaults:0
+[  472.275885] mykmod_vm_close: vma=ffff9a0f73fed5e8 npagefaults:256
+[  472.275910] mykmod_vm_open: vma=ffff9a0f73fed5e8 npagefaults:0
+[  472.278093] mykmod_vm_close: vma=ffff9a0f73fed5e8 npagefaults:256
 ------------------------------------------------------------------------------------------------------
 
-CASE 4:DEMAND (READ AND WRITE)
-[root@cs3523 devmmap_paging]# mknod /tmp/mydev_Ln5 c 243 21
+# CASE 4a:DEMAND (READ AND WRITE):MESSAGE LENGTH<=PAGESIZE(4096)
+
+[root@cs3523 devmmap_paging]# mknod /tmp/mydev_Ln5 c 243 22
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_Ln5 --pt demand --op mapwrite --op mapread --mes test2
 [root@cs3523 devmmap_paging]# dmesg | grep -e mykmod_vm_open -e mykmod_vm_close
 
-[  594.884897] mykmod_vm_open: vma=ffff99b7785a91b0 npagefaults:0
-[  594.885472] mykmod_vm_close: vma=ffff99b7785a91b0 npagefaults:256
-[  706.687035] mykmod_vm_open: vma=ffff99b775230360 npagefaults:0
-[  706.687061] mykmod_vm_close: vma=ffff99b775230360 npagefaults:0
-[  911.297362] mykmod_vm_open: vma=ffff99b7f8177510 npagefaults:0
-[  911.298046] mykmod_vm_close: vma=ffff99b7f8177510 npagefaults:256
-[  911.298054] mykmod_vm_open: vma=ffff99b7f8177510 npagefaults:0
-[  911.298720] mykmod_vm_close: vma=ffff99b7f8177510 npagefaults:256
-[ 1014.387362] mykmod_vm_open: vma=ffff99b775086ca8 npagefaults:0
-[ 1014.387392] mykmod_vm_close: vma=ffff99b775086ca8 npagefaults:1
-[ 1014.387399] mykmod_vm_open: vma=ffff99b775086ca8 npagefaults:0
-[ 1014.387424] mykmod_vm_close: vma=ffff99b775086ca8 npagefaults:1
+[  151.570537] mykmod_vm_open: vma=ffff9a0f787961b0 npagefaults:0
+[  151.572697] mykmod_vm_close: vma=ffff9a0f787961b0 npagefaults:256
+[  248.623157] mykmod_vm_open: vma=ffff9a0f78796288 npagefaults:0
+[  248.623164] mykmod_vm_close: vma=ffff9a0f78796288 npagefaults:0
+[  368.153225] mykmod_vm_open: vma=ffff9a0f78796360 npagefaults:0
+[  368.153907] mykmod_vm_close: vma=ffff9a0f78796360 npagefaults:256
+[  368.153915] mykmod_vm_open: vma=ffff9a0f78796360 npagefaults:0
+[  368.165094] mykmod_vm_close: vma=ffff9a0f78796360 npagefaults:256
+[  472.266659] mykmod_vm_open: vma=ffff9a0f73fed5e8 npagefaults:0
+[  472.275885] mykmod_vm_close: vma=ffff9a0f73fed5e8 npagefaults:256
+[  472.275910] mykmod_vm_open: vma=ffff9a0f73fed5e8 npagefaults:0
+[  472.278093] mykmod_vm_close: vma=ffff9a0f73fed5e8 npagefaults:256
+[  740.551923] mykmod_vm_open: vma=ffff9a0ff8d9b1b0 npagefaults:0
+[  740.551950] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:1
+[  740.551956] mykmod_vm_open: vma=ffff9a0ff8d9b1b0 npagefaults:0
+[  740.551965] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:1
+
+# CASE 4b:DEMAND (READ AND WRITE):MESSAGE LENGTH>PAGESIZE(4096)
+
+[root@cs3523 devmmap_paging]# mknod /tmp/mydev_Ln6 c 243 23
+[root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_Ln6 --pt demand --op mapwrite --op mapread --mes ThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisenthereforealwaysholdsiinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewistothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprinciofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleshello
+
+[root@cs3523 devmmap_paging]# dmesg | grep -e mykmod_vm_open -e mykmod_vm_close
+
+[  151.570537] mykmod_vm_open: vma=ffff9a0f787961b0 npagefaults:0
+[  151.572697] mykmod_vm_close: vma=ffff9a0f787961b0 npagefaults:256
+[  248.623157] mykmod_vm_open: vma=ffff9a0f78796288 npagefaults:0
+[  248.623164] mykmod_vm_close: vma=ffff9a0f78796288 npagefaults:0
+[  368.153225] mykmod_vm_open: vma=ffff9a0f78796360 npagefaults:0
+[  368.153907] mykmod_vm_close: vma=ffff9a0f78796360 npagefaults:256
+[  368.153915] mykmod_vm_open: vma=ffff9a0f78796360 npagefaults:0
+[  368.165094] mykmod_vm_close: vma=ffff9a0f78796360 npagefaults:256
+[  472.266659] mykmod_vm_open: vma=ffff9a0f73fed5e8 npagefaults:0
+[  472.275885] mykmod_vm_close: vma=ffff9a0f73fed5e8 npagefaults:256
+[  472.275910] mykmod_vm_open: vma=ffff9a0f73fed5e8 npagefaults:0
+[  472.278093] mykmod_vm_close: vma=ffff9a0f73fed5e8 npagefaults:256
+[  740.551923] mykmod_vm_open: vma=ffff9a0ff8d9b1b0 npagefaults:0
+[  740.551950] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:1
+[  740.551956] mykmod_vm_open: vma=ffff9a0ff8d9b1b0 npagefaults:0
+[  740.551965] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:1
+[  861.559056] mykmod_vm_open: vma=ffff9a0f787ed870 npagefaults:0
+[  861.559109] mykmod_vm_close: vma=ffff9a0f787ed870 npagefaults:2
+[  861.559115] mykmod_vm_open: vma=ffff9a0f787ed870 npagefaults:0
+[  861.559145] mykmod_vm_close: vma=ffff9a0f787ed870 npagefaults:2
+
 ------------------------------------------------------------------------------------------------------
 # UNLOADING THE DRIVER
 INSTRUCTIONS:
