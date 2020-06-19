@@ -114,9 +114,9 @@ Options:
 [  472.275910] mykmod_vm_open: vma=ffff9a0f73fed5e8 npagefaults:0
 [  472.278093] mykmod_vm_close: vma=ffff9a0f73fed5e8 npagefaults:256
 [  740.551923] mykmod_vm_open: vma=ffff9a0ff8d9b1b0 npagefaults:0
-[  740.551950] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:1
+[  740.551950] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:256
 [  740.551956] mykmod_vm_open: vma=ffff9a0ff8d9b1b0 npagefaults:0
-[  740.551965] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:1
+[  740.551965] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:256
 
 # CASE 4b:DEMAND (READ AND WRITE):MESSAGE LENGTH>PAGESIZE(4096)
 
@@ -138,13 +138,13 @@ Options:
 [  472.275910] mykmod_vm_open: vma=ffff9a0f73fed5e8 npagefaults:0
 [  472.278093] mykmod_vm_close: vma=ffff9a0f73fed5e8 npagefaults:256
 [  740.551923] mykmod_vm_open: vma=ffff9a0ff8d9b1b0 npagefaults:0
-[  740.551950] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:1
+[  740.551950] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:256
 [  740.551956] mykmod_vm_open: vma=ffff9a0ff8d9b1b0 npagefaults:0
-[  740.551965] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:1
+[  740.551965] mykmod_vm_close: vma=ffff9a0ff8d9b1b0 npagefaults:256
 [  861.559056] mykmod_vm_open: vma=ffff9a0f787ed870 npagefaults:0
-[  861.559109] mykmod_vm_close: vma=ffff9a0f787ed870 npagefaults:2
+[  861.559109] mykmod_vm_close: vma=ffff9a0f787ed870 npagefaults:256
 [  861.559115] mykmod_vm_open: vma=ffff9a0f787ed870 npagefaults:0
-[  861.559145] mykmod_vm_close: vma=ffff9a0f787ed870 npagefaults:2
+[  861.559145] mykmod_vm_close: vma=ffff9a0f787ed870 npagefaults:256
 
 ------------------------------------------------------------------------------------------------------
 # UNLOADING THE DRIVER
