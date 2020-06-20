@@ -176,6 +176,9 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)
 	printk("mykmod_mmap: filp=%p vma=%p flags=%lx\n", filp, vma, vma->vm_flags);
 
 	//TODO setup vma's flags, save private data (devinfo, npagefaults) in vm_private_data
+	if((vma->vm_pgoff) > (vma->vm_end - vma->vm_start)) {
+		return -EINVAL;
+	}
 	vma -> vm_ops = &mykmod_vm_ops;
 	vma -> vm_flags |= VM_DONTDUMP | VM_DONTEXPAND; // dont include in core dump and cannot expand with mremap()
 
