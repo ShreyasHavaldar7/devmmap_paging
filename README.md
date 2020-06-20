@@ -27,6 +27,7 @@ make[1]: Leaving directory `/root/devmmap_paging/kernel'
 make[1]: Entering directory `/root/devmmap_paging/util'
 make[1]: `memutil' is up to date.
 make[1]: Leaving directory `/root/devmmap_paging/util'
+
 [root@cs3523 devmmap_paging]# insmod kernel/mykmod.ko
 [root@cs3523 devmmap_paging]# grep mykmod /proc/devices
 243 mykmod
@@ -57,13 +58,16 @@ Options:
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_pR6 c 243 10
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_pR6 --pt prefetch --op mapread
 [root@cs3523 devmmap_paging]# dmesg | grep -e mykmod_vm_open -e mykmod_vm_close
+
 [  151.570537] mykmod_vm_open: vma=ffff9a0f787961b0 npagefaults:0
 [  151.572697] mykmod_vm_close: vma=ffff9a0f787961b0 npagefaults:256
+
 [root@cs3523 devmmap_paging]# rm -f /tmp/mydev_pR6
 ```
 ------------------------------------------------------------------------------------------------------
 
 #### CASE 2: DEMAND (READ ONLY) ####
+
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_JZ1 c 243 11
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_JZ1 --pt demand --op mapread
@@ -76,7 +80,7 @@ Options:
 ```
 ------------------------------------------------------------------------------------------------------
 
-#### CASE 3a: PREFETCH (READ AND WRITE):MESSAGE LENGTH<=PAGESIZE(4096) ####
+#### CASE 3a: PREFETCH (READ AND WRITE): MESSAGE LENGTH <= PAGESIZE ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_fBc c 243 20
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_fBc --pt prefetch --op mapwrite --op mapread --mes test2
@@ -90,11 +94,10 @@ Options:
 [root@cs3523 devmmap_paging]# rm -f /tmp/mydev_fBc
 ```
 
-#### CASE 3b: PREFETCH (READ AND WRITE):MESSAGE LENGTH>PAGESIZE(4096) ####
+#### CASE 3b: PREFETCH (READ AND WRITE): MESSAGE LENGTH > PAGESIZE ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_fAc c 243 21
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_fAc --pt prefetch --op mapwrite --op mapread --mes ThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisenthereforealwaysholdsiinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewistothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprinciofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleshello
-
 [root@cs3523 devmmap_paging]# dmesg | grep -e mykmod_vm_open -e mykmod_vm_close
 
 [  472.266659] mykmod_vm_open: vma=ffff9a0f73fed5e8 npagefaults:0
@@ -106,7 +109,7 @@ Options:
 ```
 ------------------------------------------------------------------------------------------------------
 
-#### CASE 4a: DEMAND (READ AND WRITE):MESSAGE LENGTH<=PAGESIZE(4096) ####
+#### CASE 4a: DEMAND (READ AND WRITE): MESSAGE LENGTH <= PAGESIZE ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_Ln5 c 243 22
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_Ln5 --pt demand --op mapwrite --op mapread --mes test2
@@ -120,11 +123,10 @@ Options:
 [root@cs3523 devmmap_paging]# rm -f /tmp/mydev_Ln5
 ```
 
-#### CASE 4b: DEMAND (READ AND WRITE):MESSAGE LENGTH>PAGESIZE(4096) ####
+#### CASE 4b: DEMAND (READ AND WRITE): MESSAGE LENGTH > PAGESIZE ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_Ln6 c 243 23
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_Ln6 --pt demand --op mapwrite --op mapread --mes ThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisenthereforealwaysholdsiinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewistothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprinciofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleoThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleofselectionThewisemanthereforealwaysholdsinthesematterstothisprincipleshello
-
 [root@cs3523 devmmap_paging]# dmesg | grep -e mykmod_vm_open -e mykmod_vm_close
 
 [  861.559056] mykmod_vm_open: vma=ffff9a0f787ed870 npagefaults:0
@@ -240,9 +242,9 @@ Options:
 ```
 ------------------------------------------------------------------------------------------------------
 
-#### CASE 8:ONE PROCESS WRITING TO ONE DEV AND OTHER PROCESS READING FROM ANOTHER DEV ####
+#### CASE 8: ONE PROCESS WRITING TO ONE DEV AND OTHER PROCESS READING FROM ANOTHER DEV ####
 
-#### CASE 8a:PREFETCH ####
+#### CASE 8a: PREFETCH ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_qw1 c 243 60
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_qw2 c 243 70
@@ -257,7 +259,7 @@ Options:
 
 [root@cs3523 devmmap_paging]# rm -f /tmp/mydev*
 ```
-#### CASE 8b:DEMAND PAGING ####
+#### CASE 8b: DEMAND PAGING ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_aw1 c 243 61
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_aw2 c 243 71
@@ -273,7 +275,7 @@ Options:
 [root@cs3523 devmmap_paging]# rm -f /tmp/mydev*
 ```
 ------------------------------------------------------------------------------------------------------
-#### Setting offset_t off = 4096, prefetch ####
+#### Setting offset_t off = 4096 in memutil.c: PREFETCH ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_pR6 c 243 10
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_pR6 --pt prefetch --op mapread
@@ -294,7 +296,7 @@ Options:
 ```
 ------------------------------------------------------------------------------------------------------
 
-#### Setting offset_t off = 4096, demand ####
+#### Setting offset_t off = 4096 in memutil.c: DEMAND PAGING: ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_JZl c 243 11
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_JZl --pt demand --op mapread
