@@ -154,7 +154,7 @@ Options:
 
 [root@cs3523 devmmap_paging]# rm -f /tmp/mydev_krt
 ```
-#### CASE 5b:DEMAND PAGING ####
+#### CASE 5b: DEMAND PAGING ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_grt c 243 31
 [root@cs3523 devmmap_paging]# ./util/memutil mydev_grt --pt demand --op mapread
@@ -226,7 +226,7 @@ Options:
 
 [root@cs3523 devmmap_paging]# rm -f /tmp/mydev_zxc
 ```
-#### CASE 7b:DEMAND PAGING ####
+#### CASE 7b: DEMAND PAGING ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_rty c 243 51
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_rty --pt demand --op mapwrite --mes test7b
@@ -275,7 +275,9 @@ Options:
 [root@cs3523 devmmap_paging]# rm -f /tmp/mydev*
 ```
 ------------------------------------------------------------------------------------------------------
-#### Setting offset_t off = 4096 in memutil.c: PREFETCH ####
+#### CASE 9: MEMORY MAPPING WITH A NON ZERO OFFSET (Setting offset_t off = 4096 in memutil.cpp) ####
+
+#### CASE 9a: PREFETCH ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_pR6 c 243 10
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_pR6 --pt prefetch --op mapread
@@ -296,7 +298,7 @@ Options:
 ```
 ------------------------------------------------------------------------------------------------------
 
-#### Setting offset_t off = 4096 in memutil.c: DEMAND PAGING: ####
+#### CASE 9b: DEMAND PAGING: ####
 ```
 [root@cs3523 devmmap_paging]# mknod /tmp/mydev_JZl c 243 11
 [root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_JZl --pt demand --op mapread
