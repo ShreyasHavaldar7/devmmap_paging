@@ -190,7 +190,8 @@ int main(int argc, char *argv[])
 				// If there is a message we need to read and ensure the correct message is being read
 				if (msg != NULL) {
 					do {
-						len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;	// Checking and assigning the smaller of the message length and total device length after deduction of the offset
+						len = msg_len < MYDEV_LEN - off ? msg_len: MYDEV_LEN-off;
+						// Checking and assigning the smaller of the message length and total device length after deduction of the offset
 						if (len <= 0) {	// If length is non positive the entire device memory is filled
 							break;
 						}
@@ -238,7 +239,7 @@ int main(int argc, char *argv[])
 
 				// As we have a message to write, we write it iteratively to the device memory such that it occupies all available space on that device, here 1MB
 				do {
-					len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;	// Checking and assigning the smaller of the message length and total device length after deduction of the offset
+					len = msg_len < MYDEV_LEN - off ? msg_len: MYDEV_LEN-off;	// Checking and assigning the smaller of the message length and total device length after deduction of the offset
 					if (len <= 0) {	// If length is non positive the entire device memory is filled
 						break;
 					}
@@ -257,7 +258,7 @@ int main(int argc, char *argv[])
 				// TODO. Hint use loop & modulus operator on msg to copy the string to entire device_mem
 
 				// unmap the devicemem's kernel buffer.
-				// TODO
+
 				munmap(dev_mem, MYDEV_LEN);	// Unmapping
 
 				break;
