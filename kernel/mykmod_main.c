@@ -43,7 +43,7 @@ static int mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf);
 // Data-structure to keep per device info
 struct mykmod_dev_info {
 	char *data;		// A string to save the data of the device special file
-	size_t size;		// Storing the size of the device special file
+	size_t size;		// Storing the size of the device special file if required to be used somewhere
 };
 
 // Device table data-structure to keep all device special files, using a pointer to a pointer of type "struct mykmod_dev_info"
@@ -140,7 +140,7 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)	// Invoked
 
 	// Setup vma's flags, save private data (devinfo, npagefaults) in vm_private_data
 
-	if ((vma->vm_pgoff) > (vma->vm_end - vma->vm_start))	// Ensuring that the size of the offset does not exceed the size of the entire virtual memory address space
+	if (((vma->vm_pgoff)*PAGE_SIZE + (vma->vm_end - vma->vm_start)) > MYDEV_LEN)	// Ensuring that the size of the offset does not exceed the size of the entire virtual memory address space
 	{
 		return -EINVAL;	// Else returning EINVAL error
 	}
