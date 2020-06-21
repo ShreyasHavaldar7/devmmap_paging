@@ -107,21 +107,23 @@ mykmod_open(struct inode *inodep, struct file *filep)
 		filep, filep->private_data,
 		inodep, inodep->i_private, inodep->i_rdev, MAJOR(inodep->i_rdev), MINOR(inodep->i_rdev)); // Printing the required information
 	
-	struct mykmod_dev_info *info; // Creating a struct of type mykmod_dev_info to be able to store the info of the devices
+	struct mykmod_dev_info *info;  // Creating a struct of type mykmod_dev_info to be able to store the info of the devices
 
-	// Allocate memory for devinfo and store in device table and i_private.
-	if (inodep -> i_private == NULL) { // If there is no info stored in the inode
-		info = kmalloc(sizeof(struct mykmod_dev_info), GFP_KERNEL); // Allocate memory for the device info struct.
-		info -> data = (char*)kmalloc(MYDEV_LEN, GFP_KERNEL); // Allocate memory for the data to be stored in the device info.
-		memcpy(info -> data, "Opening File", 12); // Size of message copied is 12 because the length of the string passed is 12 temporarily
-		inodep -> i_private = info; // Storing the info in the inode.
-		
+	if(inode->i_private == NULL)   // If there is no info stored in the inode
+	{
+		info = kmalloc(sizeof(struct mykmod_dev_info), GFP_KERNEL);  // Allocate memory for the device info struct.
+		info->data = (char*)kmalloc(MYDEV_LEN, GFP_KERNEL);  // Allocate memory for the data to be stored in the device info.
+		memcpy(info->data, "Opening File", 12); // Size of message copied is 12 because the length of the string passed is 12 temporarily
+		inodep->i_private = info;  // Storing the info in the inode.
+
 		int i = 0;
-		while(i<MYKMOD_MAX_DEVS && dev_table[i] != NULL) { // Checking for the first non-empty entry in the device table, while ensuring we do not cross its length.
+		while (i<MYKMOD_MAX_DEVS && dev_table[i] != NULL)  // Checking for the first non-empty entry in the device table, while ensuring we do not cross its length.
+		{
 			i++;
 		}
-		if(i<MYKMOD_MAX_DEVS) {
-			dev_table[i] = info;		// If there is a free space in the device table within its limit of 256 entries, we add the info at the empty entry.
+		if(i<MYKMOD_MAX_DEVS)
+		{
+			dev_table[i] = info;  // If there is a free space in the device table within its limit of 256 entries, we add the info at the empty entry.
 		}
 	}
 
@@ -143,21 +145,23 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)
 	printk("mykmod_mmap: filp=%p vma=%p flags=%lx\n", filp, vma, vma->vm_flags);
 
 	// Setup vma's flags, save private data (devinfo, npagefaults) in vm_private_data
-	if((vma->vm_pgoff) > (vma->vm_end - vma->vm_start)) { // Ensuring that the size and offset does not exceed the size of the entire virtual memory address space.
+
+	if((vma->vm_pgoff) > (vma->vm_end - vma->vm_start))  // Ensuring that the size and offset does not exceed the size of the entire virtual memory address space
+	{
 		return -EINVAL;
 	}
 
-	vma -> vm_ops = &mykmod_vm_ops;
-	vma -> vm_flags |= VM_DONTDUMP | VM_DONTEXPAND; // Do not include in core dump and cannot expand with mremap()
+	vma->vm_ops = &mykmod_vm_ops;
+	vma->vm_flags |= VM_DONTDUMP | VM_DONTEXPAND;  // Do not include in core dump and cannot expand with mremap()
 
-	struct mykmod_vma_info *info; // Creating an struct of mykmod_vma_info type to allow for the mapping of data
-	info = kmalloc(sizeof(struct mykmod_vma_info), GFP_KERNEL);
-	info -> devinfo = filp -> private_data;
-	vma -> vm_private_data = info; // Saving the info in the vm_area_struct
-	
+	struct mykmod_vma_info *info;  // Creating an struct of mykmod_vma_info type to allow for the mapping of data
+	info=kmalloc(sizeof(struct mykmod_vma_info), GFP_KERNEL);
+	info->devinfo = filp->private_data;
+	vma->vm_private_data = info;  // Saving the info in the vm_area_struct
+
 	mykmod_vm_open(vma);
-
 	return 0;
+
 }
 
 static void
@@ -181,17 +185,17 @@ mykmod_vm_close(struct vm_area_struct *vma)
 
 static int
 mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
-{
-	struct mykmod_vma_info *info_fault; // Creating a struct of type mykmod_vma_info
+{	
+	struct mykmod_vma_info *info_fault;   // Creating a struct of type mykmod_vma_info
 	info_fault = vma->vm_private_data;
 
 	// Build virt->phys mappings
-	if (info_fault != NULL || info_fault->devinfo->data != NULL) // Just ensuring that the mapping was successful
-	{		
-		info_fault->npagefaults++; // As this function was invoked, a page fault has occured, thus increasing the count by one.
-		struct page *page; // Creating a struct of type page
+	if(info_fault != NULL || info_fault->devinfo->data != NULL)  // Just ensuring that the mapping was successful
+	{
+		info_fault->npagefaults++;   // As this function was invoked, a page fault has occured, thus increasing the count by one.
+		struct page *page;    // Creating a struct of type page
 
-		page = virt_to_page(info_fault->devinfo->data + ((vmf->pgoff + vma->vm_pgoff) * PAGE_SIZE)); // Translating the physical addresses which was obtained by the conversion from the virtual address, to the struct
+		page = virt_to_page(info_fault->devinfo->data + ((vmf->pgoff + vma->vm_pgoff) * PAGE_SIZE));  // Translating the physical addresses which was obtained by the conversion from the virtual address, to the struct
 		// Utilizng the function virt_to_page to convert the correct virtual address, with the required offsets into a page struct.
 
 		get_page(page);
@@ -200,5 +204,6 @@ mykmod_vm_fault(struct vm_area_struct *vma, struct vm_fault *vmf)
 
 		printk("mykmod_vm_fault: vma=%p vmf=%p pgoff=%lu page=%p\n", vma, vmf, vmf->pgoff, vmf->page);
 	}
+	
 	return 0;
 }
