@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
 							i++;
 						}
 
-						off += len;	// Updating the offset value to check for next segment of device memory
+						off = off + len;	// Updating the offset value to check for next segment of device memory
 						if (off == MYDEV_LEN) {	// If the offset has reached the end of device memory, stop checking
 							break;
 						}	
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
 						i++;
 					}
 
-					off += len;	// Updating the offset value to write to the next segment of device memory
+					off = off + len;	// Updating the offset value to write to the next segment of device memory
 					if (off == MYDEV_LEN) {	// If the offset has reached the end of device memory, stop writing
 						break;
 					}
