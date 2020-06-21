@@ -9,6 +9,13 @@
 - CS18BTECH11050
 
 ------------------------------------------------------------------
+### LIST OF FILES SUBMITTED ###
+
+- *mykmod_main.c*
+- *memutil.cpp*
+- *README.md*
+- *Report.pdf*
+------------------------------------------------------------------
 
 ### COMPILATION INSTRUCTIONS ###
 
