@@ -20,12 +20,49 @@
 make[1]: Entering directory `/root/devmmap_paging/kernel'
 make -C /lib/modules/3.10.0-1062.9.1.el7.x86_64/build M=/root/devmmap_paging/kernel modules
 make[2]: Entering directory `/usr/src/kernels/3.10.0-1062.9.1.el7.x86_64'
+  CC [M]  /root/devmmap_paging/kernel/mykmod_main.o
+/root/devmmap_paging/kernel/mykmod_main.c:19:0: warning: "PAGE_SIZE" redefined [enabled by default]
+ #define PAGE_SIZE 4096
+ ^
+In file included from ./arch/x86/include/asm/ptrace.h:5:0,
+                 from ./arch/x86/include/asm/alternative.h:10,
+                 from ./arch/x86/include/asm/bitops.h:16,
+                 from include/linux/bitops.h:37,
+                 from include/linux/kernel.h:10,
+                 from include/linux/sched.h:15,
+                 from include/linux/uaccess.h:5,
+                 from /root/devmmap_paging/kernel/mykmod_main.c:4:
+./arch/x86/include/asm/page_types.h:10:0: note: this is the location of the previous definition
+ #define PAGE_SIZE (_AC(1,UL) << PAGE_SHIFT)
+ ^
+/root/devmmap_paging/kernel/mykmod_main.c: In function ‘mykmod_cleanup_module’:
+/root/devmmap_paging/kernel/mykmod_main.c:91:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  int i = 0;
+  ^
+/root/devmmap_paging/kernel/mykmod_main.c: In function ‘mykmod_open’:
+/root/devmmap_paging/kernel/mykmod_main.c:106:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  struct mykmod_dev_info *info; // Creating a struct of type mykmod_dev_info to be able to store the info of the devices
+  ^
+/root/devmmap_paging/kernel/mykmod_main.c:115:3: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+   int i = 0;
+   ^
+/root/devmmap_paging/kernel/mykmod_main.c: In function ‘mykmod_mmap’:
+/root/devmmap_paging/kernel/mykmod_main.c:151:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  struct mykmod_vma_info *info; // Creating an struct of mykmod_vma_info type to allow for the mapping of data
+  ^
+/root/devmmap_paging/kernel/mykmod_main.c: In function ‘mykmod_vm_fault’:
+/root/devmmap_paging/kernel/mykmod_main.c:188:3: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+   struct page *page; // Creating a struct of type page
+   ^
+  LD [M]  /root/devmmap_paging/kernel/mykmod.o
   Building modules, stage 2.
   MODPOST 1 modules
+  CC      /root/devmmap_paging/kernel/mykmod.mod.o
+  LD [M]  /root/devmmap_paging/kernel/mykmod.ko
 make[2]: Leaving directory `/usr/src/kernels/3.10.0-1062.9.1.el7.x86_64'
 make[1]: Leaving directory `/root/devmmap_paging/kernel'
 make[1]: Entering directory `/root/devmmap_paging/util'
-make[1]: `memutil' is up to date.
+g++ -std=c++11 -I ../include -I ../lib -L ../lib -lrt -o memutil  memutil.cpp -g -lpthread
 make[1]: Leaving directory `/root/devmmap_paging/util'
 
 [root@cs3523 devmmap_paging]# insmod kernel/mykmod.ko
@@ -331,14 +368,60 @@ Options:
 
 ### SAMPLE OUTPUT USING THE TEST SCRIPT PROVIDED ###
 
-#### BUILDING AND LOAD THE DRIVER AS PER INSTRUCTIONS ABOVE. ####
-#### INSTRUCTIONS:- ####
+#### BUILDING AND LOAD THE DRIVER AS PER INSTRUCTIONS ABOVE THEN EXECUTING THE TEST SCRIPT ####
+####  ####
 ```
+[root@cs3523 ~]# cd devmmap_paging/
+[root@cs3523 devmmap_paging]# make
+make[1]: Entering directory `/root/devmmap_paging/kernel'
+make -C /lib/modules/3.10.0-1062.9.1.el7.x86_64/build M=/root/devmmap_paging/kernel modules
+make[2]: Entering directory `/usr/src/kernels/3.10.0-1062.9.1.el7.x86_64'
+  CC [M]  /root/devmmap_paging/kernel/mykmod_main.o
+/root/devmmap_paging/kernel/mykmod_main.c:19:0: warning: "PAGE_SIZE" redefined [enabled by default]
+ #define PAGE_SIZE 4096
+ ^
+In file included from ./arch/x86/include/asm/ptrace.h:5:0,
+                 from ./arch/x86/include/asm/alternative.h:10,
+                 from ./arch/x86/include/asm/bitops.h:16,
+                 from include/linux/bitops.h:37,
+                 from include/linux/kernel.h:10,
+                 from include/linux/sched.h:15,
+                 from include/linux/uaccess.h:5,
+                 from /root/devmmap_paging/kernel/mykmod_main.c:4:
+./arch/x86/include/asm/page_types.h:10:0: note: this is the location of the previous definition
+ #define PAGE_SIZE (_AC(1,UL) << PAGE_SHIFT)
+ ^
+/root/devmmap_paging/kernel/mykmod_main.c: In function ‘mykmod_cleanup_module’:
+/root/devmmap_paging/kernel/mykmod_main.c:91:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  int i = 0;
+  ^
+/root/devmmap_paging/kernel/mykmod_main.c: In function ‘mykmod_open’:
+/root/devmmap_paging/kernel/mykmod_main.c:106:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  struct mykmod_dev_info *info; // Creating a struct of type mykmod_dev_info to be able to store the info of the devices
+  ^
+/root/devmmap_paging/kernel/mykmod_main.c:115:3: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+   int i = 0;
+   ^
+/root/devmmap_paging/kernel/mykmod_main.c: In function ‘mykmod_mmap’:
+/root/devmmap_paging/kernel/mykmod_main.c:151:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  struct mykmod_vma_info *info; // Creating an struct of mykmod_vma_info type to allow for the mapping of data
+  ^
+/root/devmmap_paging/kernel/mykmod_main.c: In function ‘mykmod_vm_fault’:
+/root/devmmap_paging/kernel/mykmod_main.c:188:3: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+   struct page *page; // Creating a struct of type page
+   ^
+  LD [M]  /root/devmmap_paging/kernel/mykmod.o
+  Building modules, stage 2.
+  MODPOST 1 modules
+  CC      /root/devmmap_paging/kernel/mykmod.mod.o
+  LD [M]  /root/devmmap_paging/kernel/mykmod.ko
+make[2]: Leaving directory `/usr/src/kernels/3.10.0-1062.9.1.el7.x86_64'
+make[1]: Leaving directory `/root/devmmap_paging/kernel'
+make[1]: Entering directory `/root/devmmap_paging/util'
+g++ -std=c++11 -I ../include -I ../lib -L ../lib -lrt -o memutil  memutil.cpp -g -lpthread
+make[1]: Leaving directory `/root/devmmap_paging/util'
 [root@cs3523 devmmap_paging]# chmod +x runtest.sh 
 [root@cs3523 devmmap_paging]# ./runtest.sh 
-```
-#### OUTPUT: ####
-```
 PASS - Test 0 : Module loaded with majorno: 243
 PASS - Test 1 : Single process reading using mapping
 PASS - Test 2 : Single process writing using mapping
@@ -346,6 +429,7 @@ PASS - Test 3 : Multiple process reading using mapping
 PASS - Test 4 : Multiple process writing using mapping
 PASS - Test 5 : One process writing using mapping and other process reading using mapping
 PASS - Test 6 : One process writing to one dev and other process reading from another dev
+
 ```
 
 ------------------------------------------------------------------------------------------------------

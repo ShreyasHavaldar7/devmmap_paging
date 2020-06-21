@@ -206,8 +206,9 @@ int main(int argc, char *argv[])
 						}
 
 						off += len;	// Updating the offset value to check for next segment of device memory
-						if (off == MYDEV_LEN)	// If the offset has reached the end of device memory, stop checking
+						if (off == MYDEV_LEN) {	// If the offset has reached the end of device memory, stop checking
 							break;
+						}	
 					} while (true);
 				}
 				// Compare the data read from devicemem with msg
@@ -248,8 +249,9 @@ int main(int argc, char *argv[])
 					}
 
 					off += len;	// Updating the offset value to write to the next segment of device memory
-					if (off == MYDEV_LEN)	// If the offset has reached the end of device memory, stop writing
+					if (off == MYDEV_LEN) {	// If the offset has reached the end of device memory, stop writing
 						break;
+					}
 				} while (true);
 
 				// TODO. Hint use loop & modulus operator on msg to copy the string to entire device_mem
