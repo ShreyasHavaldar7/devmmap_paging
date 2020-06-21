@@ -178,49 +178,42 @@ int main(int argc, char *argv[])
 				size_t len;
 				// memory map the devicemem's kernel buffer into user-space segment.
 				dev_mem = (char *)mmap(NULL, MYDEV_LEN, PROT_READ, mmap_flags, dev_fd, off); 
-				// TODO
+				// Checking if the memory mapping was successful
 				if (dev_mem == MAP_FAILED) {
 					perror("mmap read failed");
 					exit(3);
 				}
+				// If there is a message we need to read and ensure the correct message is being read
 				if (msg != NULL) {
-				// for (int i = 0; i < msg_len && i < MYDEV_LEN; i++)
-				// {
-				// 	if (msg[i] != *(mem + i))
-				// 	{
-				// 		cerr << "Read error";
-				// 		ret = -1;
-				// 	}
-				// }
 					do {
-						len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;
-						if (len<=0) {
+						len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off; // Checking and assigning the smaller of the message length and total device length after deduction of the offset
+						if (len<=0) { // If length is non positive the entire device memory is filled
 						break;
 					    }
-						for (int i = 0; i < len; i++) {
+						int i = 0;
+						while (i < len) { // Checking upto the length determined above if the message matches the message stored in the device memory
 							if (msg[i] != *(dev_mem + off + i))	{
-								cerr << "Read error";
+								cerr << "Read error"; // If does not, a read error is ecountered
 								ret = -1;
 							}
+							i++;							
 						}
-						off += len;
-						if (off == MYDEV_LEN)
+						// for (int i = 0; i < len; i++) {
+						// 	if (msg[i] != *(dev_mem + off + i))	{
+						// 		cerr << "Read error";
+						// 		ret = -1;
+						// 	}
+						// }
+						off += len; // Updating the offset value to check for next segment of device memory
+						if (off == MYDEV_LEN) // If the offset has reached the end of device memory, stop checking
 							break;
 					} while (true);
 				}
 				// Compare the data read from devicemem with msg
 				// DONOT define an array of MYDEV_LEN. Seriously! Dont need array of MYDEV_LEN size.
 				// TODO. Hint use loop & modulus operator on msg to compare the string with entire device_mem
-				// for (int i = 0; i < msg_len && i < MYDEV_LEN; i++)
-				// {
-				// 	if (msg[i] != *(dev_mem + i))
-				// 	{
-				// 		cerr << "Read error";
-				// 	}
-				// }				
-				// // unmap the devicemem's kernel buffer.
-				// TODO
-				munmap(dev_mem,MYDEV_LEN);
+
+				munmap(dev_mem,MYDEV_LEN); // Unmammping
 
 				break;
 			}
@@ -239,32 +232,31 @@ int main(int argc, char *argv[])
 				}
 				// Write the message to devicemem from msg.
 				// DONOT define an array of MYDEV_LEN. Seriously! Dont need array of MYDEV_LEN size.
-				// len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;
-				// if (len <= 0) {
-				// 	break;
-				// }
+
+				// As we have a message to write, we write it iteratively to the device memory such that it occupies all available space on that device, here 1MB
 				do {
-					len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;
-					if (len<=0) {
+					len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off; // Checking and assigning the smaller of the message length and total device length after deduction of the offset
+					if (len<=0) { // If length is non positive the entire device memory is filled
 						break;
 					}
-					for (int i = 0; i < len; i++) {
-					*(dev_mem + off + i) = msg[i] ;
-					}					
-					off += len;
-					if (off == MYDEV_LEN)
+					int i = 0;
+					while(i < len) {
+					*(dev_mem + off + i) = msg[i] ; // Writing the message entered by the user to the device memory for this segment
+					i++;						
+					}
+					// for (int i = 0; i < len; i++) {
+					// *(dev_mem + off + i) = msg[i] ;
+					// }					
+					off += len; // Updating the offset value to write to the next segment of device memory
+					if (off == MYDEV_LEN) // If the offset has reached the end of device memory, stop writing
 						break;
 				} while (true);
-				// for (int i = 0; i < msg_len && i < MYDEV_LEN; i++)
-				// {
-				// 	*(dev_mem + i) = msg[i] ;
 
-				// }
 				// TODO. Hint use loop & modulus operator on msg to copy the string to entire device_mem
 
 				// unmap the devicemem's kernel buffer.
 				// TODO
-				munmap(dev_mem,MYDEV_LEN);
+				munmap(dev_mem,MYDEV_LEN); // Unmapping
 
 				break;
 			}
