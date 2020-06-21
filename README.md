@@ -354,6 +354,16 @@ Options:
 
 [root@cs3523 devmmap_paging]# rm -f /tmp/mydev*
 ```
+------------------------------------------------------------------------------------------------------
+#### CASE 10: MEMORY MAPPING SUCH THAT IT EXCEEDS THE DEVICE FILE BOUNDS ####
+
+```
+[root@cs3523 devmmap_paging]# mknod /tmp/mydev_JZl c 243 11
+[root@cs3523 devmmap_paging]# ./util/memutil /tmp/mydev_JZl --pt demand --op mapread
+mmap read failed: Invalid argument
+
+[root@cs3523 devmmap_paging]# rm -f /tmp/mydev*
+```
 
 ------------------------------------------------------------------------------------------------------
 

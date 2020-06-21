@@ -140,9 +140,9 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)	// Invoked
 
 	// Setup vma's flags, save private data (devinfo, npagefaults) in vm_private_data
 
-	if (((vma->vm_pgoff)*PAGE_SIZE + (vma->vm_end - vma->vm_start)) > MYDEV_LEN)	// Ensuring that the size of the offset does not exceed the size of the entire virtual memory address space
+	if (((vma->vm_pgoff)*PAGE_SIZE + (vma->vm_end - vma->vm_start)) > MYDEV_LEN)	// Ensuring that the combined size and the offset do not exceed the size of the device file
 	{
-		return -EINVAL;	// Else returning EINVAL error
+		return -EINVAL;	// Else returning EINVAL error, perror number 22, printed as "Invalid argument"
 	}
 
 	vma->vm_ops = &mykmod_vm_ops;
