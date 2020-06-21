@@ -60,83 +60,80 @@ int main(int argc, char *argv[])
 			{0, 0, 0, 0}
 		};
 
-		c = getopt_long(argc, argv, "hp:m:o:", long_options,
-				&option_index);
-		if (c == -1)	//end of the command, getopt semantics
+		c = getopt_long(argc, argv,"hp:m:o:" , long_options, &option_index);
+		if (c == -1)        //end of the command, getopt semantics
 			break;
 
 		switch (c) {
-		case 'h':
-			print_help(argv[0], -1);
-			break;
-
-		case 'm':
-			if (!optarg) {
+			case 'h':
 				print_help(argv[0], -1);
-			}
-			if (msg) {
-				cerr << "Duplicate message options\n";
+				break;  
+
+			case 'm':
+				if (!optarg) {
+					print_help(argv[0], -1);
+				}
+				if (msg) {
+					cerr << "Duplicate message options\n";
+					print_help(argv[0], -1);
+				}
+
+				msg = optarg;
+				msg_len = strlen(optarg);
+				break;
+
+			case 'p':
+				if (!optarg) {
+					print_help(argv[0], -1);
+				}
+
+				if (strcmp("demand", optarg) == 0) {
+					//TODO mmap_flags = ??;
+					mmap_flags = MAP_SHARED;
+				} else if (strcmp("prefetch", optarg) == 0) {
+					//TODO mmap_flags = ??
+					mmap_flags = MAP_SHARED | MAP_POPULATE;
+				} else {
+					cerr << "Invalid operation: " << optarg << "\n";
+					print_help(argv[0], -1);
+				}
+				break;
+
+			case 'o':
+				if (!optarg) {
+					print_help(argv[0], -1);
+				}
+				if (op_cnt == OP_MAX) {
+					cerr << "Too many operations\n";
+					print_help(argv[0], -1);
+				}
+
+				if (strcmp("mapread", optarg) == 0) {
+					op[op_cnt] = OP_MAPREAD;
+					op_cnt++;
+					read_flag = true;
+				} else if (strcmp("mapwrite", optarg) == 0) {
+					op[op_cnt] = OP_MAPWRITE;
+					op_cnt++;
+					write_flag = true;
+				} else {
+					cerr << "Invalid operation: " << optarg << "\n";
+					print_help(argv[0], -1);
+				}
+				break;
+
+			case ':':
+				cerr <<  "Argument missing for option " << long_options[option_index].name << "\n";
 				print_help(argv[0], -1);
-			}
+				break;
 
-			msg = optarg;
-			msg_len = strlen(optarg);
-			break;
-
-		case 'p':
-			if (!optarg) {
+			case '?':
+				cerr << "Error, No such option\n";
 				print_help(argv[0], -1);
-			}
+				break;
 
-			if (strcmp("demand", optarg) == 0) {
-				//TODO mmap_flags = ??;
-				mmap_flags = MAP_SHARED;
-			} else if (strcmp("prefetch", optarg) == 0) {
-				//TODO mmap_flags = ??
-				mmap_flags = MAP_SHARED | MAP_POPULATE;
-			} else {
-				cerr << "Invalid operation: " << optarg << "\n";
-				print_help(argv[0], -1);
-			}
-			break;
-
-		case 'o':
-			if (!optarg) {
-				print_help(argv[0], -1);
-			}
-			if (op_cnt == OP_MAX) {
-				cerr << "Too many operations\n";
-				print_help(argv[0], -1);
-			}
-
-			if (strcmp("mapread", optarg) == 0) {
-				op[op_cnt] = OP_MAPREAD;
-				op_cnt++;
-				read_flag = true;
-			} else if (strcmp("mapwrite", optarg) == 0) {
-				op[op_cnt] = OP_MAPWRITE;
-				op_cnt++;
-				write_flag = true;
-			} else {
-				cerr << "Invalid operation: " << optarg << "\n";
-				print_help(argv[0], -1);
-			}
-			break;
-
-		case ':':
-			cerr << "Argument missing for option " <<
-			    long_options[option_index].name << "\n";
-			print_help(argv[0], -1);
-			break;
-
-		case '?':
-			cerr << "Error, No such option\n";
-			print_help(argv[0], -1);
-			break;
-
-		default:
-			cerr << "?? getopt returned character code " << c <<
-			    "\n";
+			default:
+				cerr <<  "?? getopt returned character code " << c << "\n";
 		}
 	}
 
@@ -144,7 +141,7 @@ int main(int argc, char *argv[])
 		cerr << "Need devicemem argument\n";
 		print_help(argv[0], -1);
 	} else if (optind < argc - 1) {
-		cerr << "Too many arguments\n";
+		cerr <<  "Too many arguments\n";
 		print_help(argv[0], -1);
 	}
 	dev_file = argv[optind];
@@ -157,12 +154,13 @@ int main(int argc, char *argv[])
 			print_help(argv[0], -1);
 		}
 	}
+
 	// Figure out appropriate oflag from --op
 	if (write_flag) {
 		dev_oflag = O_RDWR;
 	} else if (read_flag) {
 		dev_oflag = O_RDONLY;
-	} else {		// just read or no operation
+	} else { // just read or no operation
 		dev_oflag = O_RDONLY;
 	}
 
@@ -172,16 +170,14 @@ int main(int argc, char *argv[])
 		exit(-2);
 	}
 
-	for (int i = 0; i < op_cnt; i++) {
+	for (int i=0; i < op_cnt; i++) {
 		switch (op[i]) {
 
-		case OP_MAPREAD:{
+			case OP_MAPREAD: {
 				off_t off = 0;
 				size_t len;
 				// memory map the devicemem's kernel buffer into user-space segment.
-				dev_mem =
-				    (char *)mmap(NULL, MYDEV_LEN, PROT_READ,
-						 mmap_flags, dev_fd, off);
+				dev_mem = (char *)mmap(NULL, MYDEV_LEN, PROT_READ, mmap_flags, dev_fd, off); 
 				// Checking if the memory mapping was successful
 				if (dev_mem == MAP_FAILED) {
 					perror("mmap read failed");
@@ -190,23 +186,21 @@ int main(int argc, char *argv[])
 				// If there is a message we need to read and ensure the correct message is being read
 				if (msg != NULL) {
 					do {
-						len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;	// Checking and assigning the smaller of the message length and total device length after deduction of the offset
-						if (len <= 0) {	// If length is non positive the entire device memory is filled
-							break;
-						}
+						len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off; // Checking and assigning the smaller of the message length and total device length after deduction of the offset
+						if (len<=0) { // If length is non positive the entire device memory is filled
+						break;
+					    }
 						int i = 0;
-						while (i < len) {	// Checking upto the length determined above if the message matches the message stored in the device memory
-							if (msg[i] !=
-							    *(dev_mem + off +
-							      i)) {
-								cerr << "Read error";	// If does not, a read error is ecountered
+						while (i < len) { // Checking upto the length determined above if the message matches the message stored in the device memory
+							if (msg[i] != *(dev_mem + off + i))	{
+								cerr << "Read error"; // If does not, a read error is ecountered
 								ret = -1;
 							}
-							i++;
+							i++;							
 						}
-
-						off += len;	// Updating the offset value to check for next segment of device memory
-						if (off == MYDEV_LEN)	// If the offset has reached the end of device memory, stop checking
+						
+						off += len; // Updating the offset value to check for next segment of device memory
+						if (off == MYDEV_LEN) // If the offset has reached the end of device memory, stop checking
 							break;
 					} while (true);
 				}
@@ -214,19 +208,18 @@ int main(int argc, char *argv[])
 				// DONOT define an array of MYDEV_LEN. Seriously! Dont need array of MYDEV_LEN size.
 				// TODO. Hint use loop & modulus operator on msg to compare the string with entire device_mem
 
-				munmap(dev_mem, MYDEV_LEN);	// Unmammping
+				munmap(dev_mem,MYDEV_LEN); // Unmammping
 
 				break;
 			}
 
+			
 			// munmap(mem, MYDEV_LEN);
-		case OP_MAPWRITE:{
+			case OP_MAPWRITE: {
 				off_t off = 0;
 				size_t len;
 				// memory map the devicemem's kernel buffer into user-space segment.
-				dev_mem =
-				    (char *)mmap(NULL, MYDEV_LEN, PROT_WRITE,
-						 mmap_flags, dev_fd, off);
+				dev_mem = (char *)mmap(NULL, MYDEV_LEN, PROT_WRITE, mmap_flags, dev_fd, off);
 				// TODO
 				if (dev_mem == MAP_FAILED) {
 					perror("mmap write failed");
@@ -237,18 +230,18 @@ int main(int argc, char *argv[])
 
 				// As we have a message to write, we write it iteratively to the device memory such that it occupies all available space on that device, here 1MB
 				do {
-					len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off;	// Checking and assigning the smaller of the message length and total device length after deduction of the offset
-					if (len <= 0) {	// If length is non positive the entire device memory is filled
+					len = msg_len < MYDEV_LEN - off ? msg_len : MYDEV_LEN - off; // Checking and assigning the smaller of the message length and total device length after deduction of the offset
+					if (len<=0) { // If length is non positive the entire device memory is filled
 						break;
 					}
 					int i = 0;
-					while (i < len) {
-						*(dev_mem + off + i) = msg[i];	// Writing the message entered by the user to the device memory for this segment
-						i++;
+					while(i < len) {
+					*(dev_mem + off + i) = msg[i] ; // Writing the message entered by the user to the device memory for this segment
+					i++;						
 					}
-
-					off += len;	// Updating the offset value to write to the next segment of device memory
-					if (off == MYDEV_LEN)	// If the offset has reached the end of device memory, stop writing
+									
+					off += len; // Updating the offset value to write to the next segment of device memory
+					if (off == MYDEV_LEN) // If the offset has reached the end of device memory, stop writing
 						break;
 				} while (true);
 
@@ -256,13 +249,13 @@ int main(int argc, char *argv[])
 
 				// unmap the devicemem's kernel buffer.
 				// TODO
-				munmap(dev_mem, MYDEV_LEN);	// Unmapping
+				munmap(dev_mem,MYDEV_LEN); // Unmapping
 
 				break;
 			}
-		}		// end switch
-	}			// end for(ops)
-
+		} // end switch
+	} // end for(ops)
+	
 	close(dev_fd);
 
 	return ret;
@@ -272,13 +265,11 @@ void print_help(const char *name, int exit_value)
 {
 	cerr << "Usage: " << name << " [options] <devname>\n";
 	cerr << "Options:\n";
-	cerr <<
-	    "--operation <optype> : Where optype can be mapread, mapwrite\n";
-	cerr <<
-	    "--message <message>  : Message to be written/read-compare to/from the device memory\n";
-	cerr <<
-	    "--paging <ptype>     : Where ptype can be prefetch or demand\n";
+	cerr << "--operation <optype> : Where optype can be mapread, mapwrite\n";
+	cerr << "--message <message>  : Message to be written/read-compare to/from the device memory\n";
+	cerr << "--paging <ptype>     : Where ptype can be prefetch or demand\n";
 	cerr << "--help               : Show this help\n";
 
 	exit(exit_value);
 }
+
