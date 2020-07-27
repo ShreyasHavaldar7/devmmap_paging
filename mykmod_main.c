@@ -75,9 +75,9 @@ static int mykmod_init_module(void)
 	} else {
 		printk("register character device %d\n", mykmod_major);
 	}
-	// Initialize device table using kzalloc, of size 256 times the size of mykmod_Dev_info struct
+	// Initialize device table using kmalloc, of size 256 times the size of mykmod_Dev_info struct
 	dev_table =
-	    kzalloc(MYKMOD_MAX_DEVS * sizeof(struct mykmod_dev_info*),
+	    kmalloc(MYKMOD_MAX_DEVS * sizeof(struct mykmod_dev_info),
 		    GFP_KERNEL);
 
 	return 0;
@@ -107,8 +107,8 @@ static int mykmod_open(struct inode *inodep, struct file *filep)
 
 	if (inodep->i_private == NULL)	// If there is no info stored in the file at the moment, so allocating space and storing a temporary string until it is written to. Pointing to the info via inode pointer.
 	{
-		info = kzalloc(sizeof(struct mykmod_dev_info), GFP_KERNEL);	// Allocate memory for the device info struct.
-		info->data = (char *)kzalloc(MYDEV_LEN, GFP_KERNEL);	// Allocate memory for the data to be stored in the device info.
+		info = kmalloc(sizeof(struct mykmod_dev_info), GFP_KERNEL);	// Allocate memory for the device info struct.
+		info->data = (char *)kmalloc(MYDEV_LEN, GFP_KERNEL);	// Allocate memory for the data to be stored in the device info.
 		memcpy(info->data, "Opening File", 12);	// Size of message copied is 12 because the length of the string passed is 12 temporarily
 		inodep->i_private = info;	// Storing the info in the inode.
 
@@ -149,7 +149,7 @@ static int mykmod_mmap(struct file *filp, struct vm_area_struct *vma)	// Invoked
 	vma->vm_flags |= VM_DONTDUMP | VM_DONTEXPAND;	// Do not include in core dump and cannot expand with mremap()
 
 	struct mykmod_vma_info *info;	// Creating an struct of mykmod_vma_info type to allow for the mapping of data
-	info = kzalloc(sizeof(struct mykmod_vma_info), GFP_KERNEL);
+	info = kmalloc(sizeof(struct mykmod_vma_info), GFP_KERNEL);
 	info->devinfo = filp->private_data;
 	vma->vm_private_data = info;	// Saving the info in the vm_area_struct
 	// All relevant info has been transferred
